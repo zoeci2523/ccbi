@@ -2,32 +2,33 @@ package com.cicih.ccbi.common;
 
 import com.cicih.ccbi.constant.CommonConstant;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * 分页请求
- *
-
- */
 @Data
 public class PageRequest {
 
     /**
-     * 当前页号
+     * current page
      */
+    @NotNull
     private long current = 1;
 
     /**
-     * 页面大小
+     * page size
      */
+    @NotNull
     private long pageSize = 10;
 
     /**
-     * 排序字段
+     * sorting field
      */
+    @Nullable
     private String sortField;
 
     /**
-     * 排序顺序（默认升序）
+     * sorting order
      */
+    @NotNull
     private String sortOrder = CommonConstant.SORT_ORDER_ASC;
 }

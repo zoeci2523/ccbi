@@ -9,12 +9,12 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * user
- * @TableName user
+ * task
+ * @TableName task
  */
-@TableName(value ="user")
+@TableName(value ="task")
 @Data
-public class User implements Serializable {
+public class Task implements Serializable {
     /**
      * id
      */
@@ -22,44 +22,24 @@ public class User implements Serializable {
     private Long id;
 
     /**
-     * user account
+     * user id
      */
-    private String account;
+    private Long userId;
 
     /**
-     * user account password
+     * content id
      */
-    private String password;
+    private Long contentId;
 
     /**
-     * wechat open platform id
+     * task type
      */
-    private String unionId;
+    private Integer type;
 
     /**
-     * wechat mp(media platform) openId
+     * task progress: 0-init, 1-wait, 2-running, 3-succeed, 4-failed
      */
-    private String mpopenId;
-
-    /**
-     * username, can be duplicated
-     */
-    private String username;
-
-    /**
-     * user avatar, url
-     */
-    private String avatar;
-
-    /**
-     * user profile
-     */
-    private String profile;
-
-    /**
-     * user role：user/admin/ban, default user
-     */
-    private String role;
+    private Integer status;
 
     /**
      * created time

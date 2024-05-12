@@ -9,12 +9,12 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * user
- * @TableName user
+ * chart_detail
+ * @TableName chart_detail
  */
-@TableName(value ="user")
+@TableName(value ="chart_detail")
 @Data
-public class User implements Serializable {
+public class ChartDetail implements Serializable {
     /**
      * id
      */
@@ -22,44 +22,49 @@ public class User implements Serializable {
     private Long id;
 
     /**
-     * user account
+     * task id
      */
-    private String account;
+    private Long taskId;
 
     /**
-     * user account password
+     * user id
      */
-    private String password;
+    private Long userId;
 
     /**
-     * wechat open platform id
+     * analysis goal of the chart
      */
-    private String unionId;
+    private String goal;
 
     /**
-     * wechat mp(media platform) openId
+     * chart name
      */
-    private String mpopenId;
+    private String name;
 
     /**
-     * username, can be duplicated
+     * chart raw data
      */
-    private String username;
+    private String chartData;
 
     /**
-     * user avatar, url
+     * chart type
      */
-    private String avatar;
+    private String chartType;
 
     /**
-     * user profile
+     * generated chart data
      */
-    private String profile;
+    private String generateChart;
 
     /**
-     * user role：user/admin/ban, default user
+     * generated result
      */
-    private String role;
+    private String generateResult;
+
+    /**
+     * execute message
+     */
+    private String execMessage;
 
     /**
      * created time
