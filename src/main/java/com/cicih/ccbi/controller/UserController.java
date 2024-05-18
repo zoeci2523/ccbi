@@ -3,16 +3,14 @@ package com.cicih.ccbi.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cicih.ccbi.annotation.AuthCheck;
 import com.cicih.ccbi.common.BaseResponse;
-import com.cicih.ccbi.common.DeleteRequest;
 import com.cicih.ccbi.common.ErrorCode;
 import com.cicih.ccbi.common.ResultUtils;
 import com.cicih.ccbi.constant.UserConstant;
 import com.cicih.ccbi.exception.BusinessException;
 import com.cicih.ccbi.exception.ThrowUtils;
+import com.cicih.ccbi.mapper.UserMapper;
 import com.cicih.ccbi.model.dto.user.UserAddRequest;
-import com.cicih.ccbi.model.dto.user.UserLoginRequest;
 import com.cicih.ccbi.model.dto.user.UserQueryRequest;
-import com.cicih.ccbi.model.dto.user.UserRegisterRequest;
 import com.cicih.ccbi.model.dto.user.UserUpdateMyRequest;
 import com.cicih.ccbi.model.dto.user.UserUpdateRequest;
 import com.cicih.ccbi.model.entity.User;
@@ -24,6 +22,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,10 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 用户接口
- *
- */
 @RestController
 @RequestMapping("/user")
 @Slf4j
@@ -42,59 +37,26 @@ public class UserController {
 
     @Resource
     private UserService userService;
+    @Resource
+    private UserMapper userMapper;
 
-
-    // region 登录相关
-
-    /**
-     * 用户注册
-     *
-     * @param userRegisterRequest
-     * @return
-     */
     @PostMapping("/register")
-    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
-        if (userRegisterRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        String userAccount = userRegisterRequest.getUserAccount();
-        String userPassword = userRegisterRequest.getUserPassword();
-        String checkPassword = userRegisterRequest.getCheckPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
+    public BaseResponse<String> userRegister(@NotNull String account, @NotNull String password, @NotNull String checkPassword) {
+        if (StringUtils.isAnyBlank(account, password, checkPassword)) {
             return null;
         }
-        long result = userService.userRegister(userAccount, userPassword, checkPassword);
-        return ResultUtils.success(result);
+        return ResultUtils.success(userService.userRegister(account, password, checkPassword));
     }
 
-    /**
-     * 用户登录
-     *
-     * @param userLoginRequest
-     * @param request
-     * @return
-     */
     @PostMapping("/login")
-    public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
-        if (userLoginRequest == null) {
+    public BaseResponse<LoginUserVO> userLogin(@NotNull String account, @NotNull String password, @NotNull HttpServletRequest request) {
+        if (StringUtils.isAnyBlank(account, password)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        String userAccount = userLoginRequest.getUserAccount();
-        String userPassword = userLoginRequest.getUserPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
+        LoginUserVO loginUserVO = userService.userLogin(account, password, request);
         return ResultUtils.success(loginUserVO);
     }
 
-
-    /**
-     * 用户注销
-     *
-     * @param request
-     * @return
-     */
     @PostMapping("/logout")
     public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
         if (request == null) {
@@ -104,31 +66,15 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
-    /**
-     * 获取当前登录用户
-     *
-     * @param request
-     * @return
-     */
     @GetMapping("/get/login")
     public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
         User user = userService.getLoginUser(request);
         return ResultUtils.success(userService.getLoginUserVO(user));
     }
 
-    // endregion
-
-    // region 增删改查
-
-    /**
-     * 创建用户
-     *
-     * @param userAddRequest
-     * @return
-     */
     @PostMapping("/add")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest) {
+    @AuthCheck(mustRole = User.Role.ADMIN)
+    public BaseResponse<String> addUser(@RequestBody UserAddRequest userAddRequest) {
         if (userAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -139,30 +85,14 @@ public class UserController {
         return ResultUtils.success(user.getId());
     }
 
-    /**
-     * 删除用户
-     *
-     * @param deleteRequest
-     * @return
-     */
     @PostMapping("/delete")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest) {
-        if (deleteRequest == null || deleteRequest.getId() <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        boolean b = userService.removeById(deleteRequest.getId());
-        return ResultUtils.success(b);
+    @AuthCheck(mustRole = User.Role.ADMIN)
+    public BaseResponse<Boolean> deleteUser(@NotNull String userId) {
+        return ResultUtils.success(userService.removeById(userId));
     }
 
-    /**
-     * 更新用户
-     *
-     * @param userUpdateRequest
-     * @return
-     */
     @PostMapping("/update")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @AuthCheck(mustRole = User.Role.ADMIN)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -174,14 +104,8 @@ public class UserController {
         return ResultUtils.success(true);
     }
 
-    /**
-     * 根据 id 获取用户（仅管理员）
-     *
-     * @param id
-     * @return
-     */
     @GetMapping("/get")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @AuthCheck(mustRole = User.Role.ADMIN)
     public BaseResponse<User> getUserById(long id) {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -191,12 +115,6 @@ public class UserController {
         return ResultUtils.success(user);
     }
 
-    /**
-     * 根据 id 获取包装类
-     *
-     * @param id
-     * @return
-     */
     @GetMapping("/get/vo")
     public BaseResponse<UserVO> getUserVOById(long id) {
         BaseResponse<User> response = getUserById(id);
@@ -205,23 +123,23 @@ public class UserController {
     }
 
     /**
-     * 分页获取用户列表（仅管理员）
+     * List user by page (admin only)
      *
      * @param userQueryRequest
      * @return
      */
     @PostMapping("/list/page")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @AuthCheck(mustRole = User.Role.ADMIN)
     public BaseResponse<Page<User>> listUserByPage(@RequestBody UserQueryRequest userQueryRequest) {
         long current = userQueryRequest.getCurrent();
         long size = userQueryRequest.getPageSize();
         Page<User> userPage = userService.page(new Page<>(current, size),
-                userService.getQueryWrapper(userQueryRequest));
+                userMapper.getQueryWrapper(userQueryRequest));
         return ResultUtils.success(userPage);
     }
 
     /**
-     * 分页获取用户封装列表
+     * List user info by page
      *
      * @param userQueryRequest
      * @return
@@ -233,20 +151,18 @@ public class UserController {
         }
         long current = userQueryRequest.getCurrent();
         long size = userQueryRequest.getPageSize();
-        // 限制爬虫
+        // restrict web crawler
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Page<User> userPage = userService.page(new Page<>(current, size),
-                userService.getQueryWrapper(userQueryRequest));
+                userMapper.getQueryWrapper(userQueryRequest));
         Page<UserVO> userVOPage = new Page<>(current, size, userPage.getTotal());
         List<UserVO> userVO = userService.getUserVO(userPage.getRecords());
         userVOPage.setRecords(userVO);
         return ResultUtils.success(userVOPage);
     }
 
-    // endregion
-
     /**
-     * 更新个人信息
+     * Update personal infomation
      *
      * @param userUpdateMyRequest
      * @param request

@@ -9,11 +9,6 @@ import com.cicih.ccbi.model.vo.UserVO;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-/**
- * 用户服务
- *
-
- */
 public interface UserService extends IService<User> {
 
     /**
@@ -24,7 +19,7 @@ public interface UserService extends IService<User> {
      * @param checkPassword 校验密码
      * @return 新用户 id
      */
-    long userRegister(String userAccount, String userPassword, String checkPassword);
+    String userRegister(String userAccount, String userPassword, String checkPassword);
 
     /**
      * 用户登录
@@ -98,13 +93,5 @@ public interface UserService extends IService<User> {
      * @return
      */
     List<UserVO> getUserVO(List<User> userList);
-
-    /**
-     * 获取查询条件
-     *
-     * @param userQueryRequest
-     * @return
-     */
-    QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 
 }

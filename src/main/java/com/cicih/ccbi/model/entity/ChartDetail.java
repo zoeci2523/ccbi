@@ -1,35 +1,29 @@
 package com.cicih.ccbi.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
-/**
- * chart_detail
- * @TableName chart_detail
- */
 @TableName(value ="chart_detail")
 @Data
 public class ChartDetail implements Serializable {
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
-    private Long id;
+    @TableId(type = IdType.INPUT)
+    private String id;
 
     /**
      * task id
      */
-    private Long taskId;
+    private String taskId;
 
     /**
      * user id
      */
-    private Long userId;
+    private String userId;
 
     /**
      * analysis goal of the chart
@@ -37,9 +31,9 @@ public class ChartDetail implements Serializable {
     private String goal;
 
     /**
-     * chart name
+     * chart title
      */
-    private String name;
+    private String title;
 
     /**
      * chart raw data
@@ -77,8 +71,14 @@ public class ChartDetail implements Serializable {
     private Date updateTime;
 
     /**
-     * delete status
+     * be public or not, 0-public, 1-private
      */
+    private Integer isPublic;
+
+    /**
+     * delete status, 0-false, 1-true
+     */
+    @TableLogic
     private Integer isDelete;
 
     @TableField(exist = false)

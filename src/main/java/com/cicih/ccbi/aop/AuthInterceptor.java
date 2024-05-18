@@ -29,7 +29,7 @@ public class AuthInterceptor {
     private UserService userService;
 
     /**
-     * 执行拦截
+     * Authentication interceptor
      *
      * @param joinPoint
      * @param authCheck
@@ -37,30 +37,21 @@ public class AuthInterceptor {
      */
     @Around("@annotation(authCheck)")
     public Object doInterceptor(ProceedingJoinPoint joinPoint, AuthCheck authCheck) throws Throwable {
-        String mustRole = authCheck.mustRole();
+        User.Role mustRole = authCheck.mustRole();
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-        // 当前登录用户
+        // check if current user has authentication
         User loginUser = userService.getLoginUser(request);
-        // 必须有该权限才通过
-        if (StringUtils.isNotBlank(mustRole)) {
-            UserRoleEnum mustUserRoleEnum = UserRoleEnum.getEnumByValue(mustRole);
-            if (mustUserRoleEnum == null) {
+        User.Role userRole = loginUser.getRoleEnumValue();
+
+        if (User.Role.BAN.equals(userRole)) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        if (User.Role.ADMIN.equals(mustRole)) {
+            if (!mustRole.equals(userRole)) {
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-            }
-            String userRole = loginUser.getRole();
-            // 如果被封号，直接拒绝
-            if (UserRoleEnum.BAN.equals(mustUserRoleEnum)) {
-                throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-            }
-            // 必须有管理员权限
-            if (UserRoleEnum.ADMIN.equals(mustUserRoleEnum)) {
-                if (!mustRole.equals(userRole)) {
-                    throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-                }
             }
         }
-        // 通过权限校验，放行
         return joinPoint.proceed();
     }
 }

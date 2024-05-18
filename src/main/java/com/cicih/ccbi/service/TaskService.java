@@ -2,6 +2,7 @@ package com.cicih.ccbi.service;
 
 import com.cicih.ccbi.model.entity.Task;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jetbrains.annotations.NotNull;
 
 /**
 * @author fengxiaoha
@@ -10,4 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface TaskService extends IService<Task> {
 
+    @NotNull
+    String iniTask(@NotNull String userId, @NotNull String contentId, @NotNull Task.Type type);
 }

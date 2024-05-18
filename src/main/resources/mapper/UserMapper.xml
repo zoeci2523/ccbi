@@ -5,7 +5,7 @@
 <mapper namespace="com.cicih.ccbi.mapper.UserMapper">
 
     <resultMap id="BaseResultMap" type="com.cicih.ccbi.model.entity.User">
-            <id property="id" column="id" jdbcType="BIGINT"/>
+            <id property="id" column="id" jdbcType="VARCHAR"/>
             <result property="account" column="account" jdbcType="VARCHAR"/>
             <result property="password" column="password" jdbcType="VARCHAR"/>
             <result property="unionId" column="unionId" jdbcType="VARCHAR"/>
@@ -13,7 +13,7 @@
             <result property="username" column="username" jdbcType="VARCHAR"/>
             <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
             <result property="profile" column="profile" jdbcType="VARCHAR"/>
-            <result property="role" column="role" jdbcType="VARCHAR"/>
+            <result property="role" column="role" jdbcType="TINYINT"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>

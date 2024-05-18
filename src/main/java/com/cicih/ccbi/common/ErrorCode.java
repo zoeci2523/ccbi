@@ -1,30 +1,23 @@
 package com.cicih.ccbi.common;
 
 /**
- * 自定义错误码
- *
-
+ * Application self-defined error code
  */
 public enum ErrorCode {
 
     SUCCESS(0, "ok"),
-    PARAMS_ERROR(40000, "请求参数错误"),
-    NOT_LOGIN_ERROR(40100, "未登录"),
-    NO_AUTH_ERROR(40101, "无权限"),
-    NOT_FOUND_ERROR(40400, "请求数据不存在"),
-    UPDATED_ERROR(40401, "更新异常"),
-    FORBIDDEN_ERROR(40300, "禁止访问"),
-    SYSTEM_ERROR(50000, "系统内部异常"),
-    OPERATION_ERROR(50001, "操作失败");
+    PARAMS_ERROR(40000, "wrong params"),
+    NOT_LOGIN_ERROR(40100, "not login"),
+    NO_AUTH_ERROR(40101, "no authentication"),
+    NOT_FOUND_ERROR(40400, "data not found"),
+    CREATE_ERROR(40401, "create error"),
+    UPDATE_ERROR(40402, "update error"),
+    DELETE_ERROR(40403, "delete error"),
+    FORBIDDEN_ERROR(40300, "access denied"),
+    SYSTEM_ERROR(50000, "system error"),
+    OPERATION_ERROR(50001, "operation error");
 
-    /**
-     * 状态码
-     */
     private final int code;
-
-    /**
-     * 信息
-     */
     private final String message;
 
     ErrorCode(int code, String message) {

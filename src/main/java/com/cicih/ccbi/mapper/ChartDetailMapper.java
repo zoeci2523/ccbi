@@ -9,28 +9,31 @@ import com.cicih.ccbi.utils.SqlUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Chart;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface ChartDetailMapper extends BaseMapper<ChartDetail> {
 
-    default QueryWrapper<ChartDetail> getQueryWrapper(ChartQueryRequest chartQueryRequest) {
+    default QueryWrapper<ChartDetail> getQueryWrapper(@NotNull ChartQueryRequest chartQueryRequest) {
         QueryWrapper<ChartDetail> queryWrapper = new QueryWrapper<>();
         if (chartQueryRequest == null) {
             return queryWrapper;
         }
-        Long id = chartQueryRequest.getId();
-        String name = chartQueryRequest.getName();
+        String title = chartQueryRequest.getTitle();
         String goal = chartQueryRequest.getGoal();
         String chartType = chartQueryRequest.getChartType();
-        Long userId = chartQueryRequest.getUserId();
+        String userId = chartQueryRequest.getUserId();
         String sortField = chartQueryRequest.getSortField();
         String sortOrder = chartQueryRequest.getSortOrder();
+        Boolean publicOnly = chartQueryRequest.getPublicOnly();
 
-        queryWrapper.eq(id != null && id > 0, "id", id);
-        queryWrapper.like(StringUtils.isNotBlank(name), "name", name);
+//        queryWrapper.eq(id != null, "id", id);
+        queryWrapper.like(StringUtils.isNotBlank(title), "title", title);
         queryWrapper.eq(StringUtils.isNotBlank(goal), "goal", goal);
         queryWrapper.eq(StringUtils.isNotBlank(chartType), "chartType", chartType);
         queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
-        queryWrapper.eq("isDelete", false);
+//        queryWrapper.eq("isDelete", false);
+        queryWrapper.eq(publicOnly != null && publicOnly, "isPublic", 0);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;

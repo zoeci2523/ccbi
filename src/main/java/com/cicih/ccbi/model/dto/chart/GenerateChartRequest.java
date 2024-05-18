@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public class GenerateChartRequest {
     @NotNull
-    private String name;
+    private String title;
     @NotNull
     private String goal;
     @NotNull

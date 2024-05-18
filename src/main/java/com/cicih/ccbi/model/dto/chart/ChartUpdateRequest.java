@@ -1,18 +1,20 @@
 package com.cicih.ccbi.model.dto.chart;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 public class ChartUpdateRequest  implements Serializable {
 
     @NotNull
-    private Long id;
+    private String id;
     @Nullable
-    private String name;
+    private String title;
     @Nullable
     private String goal;
     @Nullable

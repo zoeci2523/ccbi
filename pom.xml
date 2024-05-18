@@ -50,6 +50,7 @@
             <artifactId>spring-session-data-redis</artifactId>
         </dependency>
         <!-- https://doc.xiaominfo.com/knife4j/documentation/get_start.html-->
+        <!--swagger3-->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-boot-starter</artifactId>

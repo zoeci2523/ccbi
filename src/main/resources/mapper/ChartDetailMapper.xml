@@ -5,24 +5,26 @@
 <mapper namespace="com.cicih.ccbi.mapper.ChartDetailMapper">
 
     <resultMap id="BaseResultMap" type="com.cicih.ccbi.model.entity.ChartDetail">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="taskId" column="taskId" jdbcType="BIGINT"/>
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="taskId" column="taskId" jdbcType="VARCHAR"/>
+            <result property="userId" column="userId" jdbcType="VARCHAR"/>
             <result property="goal" column="goal" jdbcType="VARCHAR"/>
-            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
             <result property="chartData" column="chartData" jdbcType="VARCHAR"/>
             <result property="chartType" column="chartType" jdbcType="VARCHAR"/>
-            <result property="genChart" column="genChart" jdbcType="VARCHAR"/>
-            <result property="genResult" column="genResult" jdbcType="VARCHAR"/>
+            <result property="generateChart" column="genChart" jdbcType="VARCHAR"/>
+            <result property="generateResult" column="genResult" jdbcType="VARCHAR"/>
             <result property="execMessage" column="execMessage" jdbcType="VARCHAR"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isPublic" column="isPublic" jdbcType="TINYINT"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,taskId,goal,
-        name,chartData,chartType,
-        genChart,genResult,execMessage,
-        createTime,updateTime,isDelete
+        id,taskId,userId,goal,
+        title,chartData,chartType,
+        generateChart,generateResult,execMessage,
+        createTime,updateTime,isPublic,isDelete
     </sql>
 </mapper>

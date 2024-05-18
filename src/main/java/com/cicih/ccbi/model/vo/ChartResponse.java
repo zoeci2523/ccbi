@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 @Data
 public class ChartResponse {
     @NotNull
-    private Long chartId;
+    private String chartId;
     @Nullable
     private String generateChart;
     @Nullable
