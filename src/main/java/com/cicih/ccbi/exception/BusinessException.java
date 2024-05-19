@@ -2,16 +2,8 @@ package com.cicih.ccbi.exception;
 
 import com.cicih.ccbi.common.ErrorCode;
 
-/**
- * 自定义异常类
- *
-
- */
 public class BusinessException extends RuntimeException {
 
-    /**
-     * 错误码
-     */
     private final int code;
 
     public BusinessException(int code, String message) {

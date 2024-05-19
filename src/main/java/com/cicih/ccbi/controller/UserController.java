@@ -5,7 +5,6 @@ import com.cicih.ccbi.annotation.AuthCheck;
 import com.cicih.ccbi.common.BaseResponse;
 import com.cicih.ccbi.common.ErrorCode;
 import com.cicih.ccbi.common.ResultUtils;
-import com.cicih.ccbi.constant.UserConstant;
 import com.cicih.ccbi.exception.BusinessException;
 import com.cicih.ccbi.exception.ThrowUtils;
 import com.cicih.ccbi.mapper.UserMapper;

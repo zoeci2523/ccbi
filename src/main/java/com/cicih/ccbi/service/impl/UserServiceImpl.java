@@ -89,9 +89,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = this.baseMapper.selectOne(queryWrapper);
 
         if (user == null) {
-            log.info("User login failed, userAccount cannot match userPassword");
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "User login failed, userAccount cannot match " +
-                    "userPassword");
+            log.info("User login failed, account cannot match password");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "User login failed, account cannot match password");
         }
         // set login state into session
         request.getSession().setAttribute(USER_LOGIN_STATE, user);

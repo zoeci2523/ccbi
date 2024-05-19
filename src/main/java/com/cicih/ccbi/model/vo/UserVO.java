@@ -5,41 +5,17 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 用户视图（脱敏）
+ * User view object (desensitisation)
  *
-
  */
 @Data
 public class UserVO implements Serializable {
 
-    /**
-     * id
-     */
     private String id;
-
-    /**
-     * 用户昵称
-     */
-    private String userName;
-
-    /**
-     * 用户头像
-     */
-    private String userAvatar;
-
-    /**
-     * 用户简介
-     */
-    private String userProfile;
-
-    /**
-     * 用户角色：user/admin/ban
-     */
-    private String userRole;
-
-    /**
-     * 创建时间
-     */
+    private String username;
+    private String avatar;
+    private String profile;
+    private Integer role;
     private Date createTime;
 
     private static final long serialVersionUID = 1L;
