@@ -36,7 +36,7 @@ public class ChartDetail implements Serializable {
     private String title;
 
     /**
-     * chart raw data
+     * chart csv data (transferred)
      */
     private String chartData;
 
@@ -54,11 +54,6 @@ public class ChartDetail implements Serializable {
      * generated result
      */
     private String generateResult;
-
-    /**
-     * execute message
-     */
-    private String execMessage;
 
     /**
      * created time

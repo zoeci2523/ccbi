@@ -10,7 +10,7 @@ import com.cicih.ccbi.exception.ThrowUtils;
 import com.cicih.ccbi.model.dto.chart.*;
 import com.cicih.ccbi.model.entity.ChartDetail;
 import com.cicih.ccbi.model.entity.User;
-import com.cicih.ccbi.model.vo.ChartResponse;
+import com.cicih.ccbi.model.vo.MQTaskResponse;
 import com.cicih.ccbi.service.ChartDetailService;
 import com.cicih.ccbi.service.UserService;
 import org.jetbrains.annotations.NotNull;
@@ -71,6 +71,7 @@ public class ChartDetailController {
 
     /**
      * Get single chart
+     *
      * @param id
      * @return
      */
@@ -85,13 +86,14 @@ public class ChartDetailController {
 
     /**
      * Get my list of chart
+     *
      * @param chartQueryRequest
      * @param request
      * @return
      */
     @PostMapping("/my/list/page")
     public BaseResponse<Page<ChartDetail>> listMyChartByPage(@RequestBody ChartQueryRequest chartQueryRequest,
-                                                           HttpServletRequest request) {
+                                                             HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         chartQueryRequest.setUserId(loginUser.getId());
         return ResultUtils.success(chartDetailService.getChartByPage(chartQueryRequest));
@@ -99,6 +101,7 @@ public class ChartDetailController {
 
     /**
      * Get public chart by page
+     *
      * @param chartQueryRequest
      * @return
      */
@@ -109,7 +112,7 @@ public class ChartDetailController {
 
     @PostMapping("/edit")
     public BaseResponse<String> editChart(@RequestBody ChartEditRequest chartEditRequest,
-                                        @NotNull HttpServletRequest request) {
+                                          @NotNull HttpServletRequest request) {
         ChartDetail oldChart = chartDetailService.getById(chartEditRequest.getId());
         ThrowUtils.throwIf(oldChart == null, ErrorCode.NOT_FOUND_ERROR);
         User loginUser = userService.getLoginUser(request);
@@ -118,16 +121,16 @@ public class ChartDetailController {
         }
         ChartDetail newChart = new ChartDetail();
         BeanUtils.copyProperties(chartEditRequest, newChart);
-        return chartDetailService.updateById(newChart)? ResultUtils.success(newChart.getId()) :
+        return chartDetailService.updateById(newChart) ? ResultUtils.success(newChart.getId()) :
                 ResultUtils.error(ErrorCode.UPDATE_ERROR, "Failed to edit chart: " + oldChart.getId());
     }
 
     @PostMapping("/generate/chart")
-    public BaseResponse<ChartResponse> generateChart(@RequestPart("file") MultipartFile multipartFile,
-                                                     @NotNull GenerateChartRequest generateChartRequest,
-                                                     @NotNull HttpServletRequest request) {
-        // TODO 待补充
-        return null;
+    public BaseResponse<MQTaskResponse> generateChart(@RequestPart("file") MultipartFile multipartFile,
+                                                      @NotNull ChartAddRequest chartAddRequest,
+                                                      @NotNull HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        return chartDetailService.startChartGeneration(multipartFile, chartAddRequest, loginUser.getId());
     }
 
 

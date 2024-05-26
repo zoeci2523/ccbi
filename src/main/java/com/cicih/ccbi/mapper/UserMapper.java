@@ -14,10 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public interface UserMapper extends BaseMapper<User> {
 
     default QueryWrapper<User> getQueryWrapper(@NotNull UserQueryRequest userQueryRequest) {
-        if (userQueryRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "Empty params");
-        }
-        String id = userQueryRequest.getId();
+//        String id = userQueryRequest.getId();
         String unionId = userQueryRequest.getUnionId();
         String mpOpenId = userQueryRequest.getMpOpenId();
         String userName = userQueryRequest.getUsername();
@@ -26,7 +23,7 @@ public interface UserMapper extends BaseMapper<User> {
         String sortField = userQueryRequest.getSortField();
         String sortOrder = userQueryRequest.getSortOrder();
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(id != null, "id", id);
+//        queryWrapper.eq(id != null, "id", id);
         queryWrapper.eq(StringUtils.isNotBlank(unionId), "unionId", unionId);
         queryWrapper.eq(StringUtils.isNotBlank(mpOpenId), "mpOpenId", mpOpenId);
         queryWrapper.eq(StringUtils.isNotBlank(userRole), "role", userRole);

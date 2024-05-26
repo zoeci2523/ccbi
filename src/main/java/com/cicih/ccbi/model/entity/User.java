@@ -51,7 +51,7 @@ public class User implements Serializable {
     private String profile;
 
     /**
-     * user role：0-user, 1-admin, 2-ban, default user
+     * user role：0-user, 1-admin, 2-ban, default 0-user
      */
     private Integer role;
     private Date createTime;

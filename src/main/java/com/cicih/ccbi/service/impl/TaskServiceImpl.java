@@ -1,15 +1,17 @@
 package com.cicih.ccbi.service.impl;
 
 import cn.hutool.core.lang.UUID;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cicih.ccbi.common.ErrorCode;
 import com.cicih.ccbi.exception.BusinessException;
 import com.cicih.ccbi.exception.ThrowUtils;
 import com.cicih.ccbi.mapper.UserMapper;
+import com.cicih.ccbi.model.dto.task.TaskQueryRequest;
 import com.cicih.ccbi.model.entity.Task;
 import com.cicih.ccbi.service.TaskService;
 import com.cicih.ccbi.mapper.TaskMapper;
-import com.cicih.ccbi.service.UserService;
+import org.apache.poi.ss.formula.functions.T;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
 
     @Resource
     UserMapper userMapper;
+    @Resource
+    TaskMapper taskMapper;
 
     @Override
     @NotNull
@@ -40,6 +44,15 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
 
     public String updateTaskByContentId(){
         return null;
+    }
+
+    @Override
+    @NotNull
+    public Task getTaskByQueryParams(@NotNull TaskQueryRequest queryRequest){
+        QueryWrapper<Task> queryWrapper = taskMapper.getQueryWrapper(queryRequest);
+        Task task = getOne(queryWrapper);
+        ThrowUtils.throwIf(task == null, ErrorCode.NOT_FOUND_ERROR);
+        return task;
     }
 
 }

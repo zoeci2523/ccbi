@@ -1,15 +1,15 @@
 package com.cicih.ccbi.model.vo;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Data
-public class ChartResponse {
+@NoArgsConstructor
+public class MQTaskResponse {
     @NotNull
-    private String chartId;
-    @Nullable
+    private String taskId;
     private String generateChart;
-    @Nullable
     private String generateResult;
 }

@@ -16,9 +16,6 @@ public interface ChartDetailMapper extends BaseMapper<ChartDetail> {
 
     default QueryWrapper<ChartDetail> getQueryWrapper(@NotNull ChartQueryRequest chartQueryRequest) {
         QueryWrapper<ChartDetail> queryWrapper = new QueryWrapper<>();
-        if (chartQueryRequest == null) {
-            return queryWrapper;
-        }
         String title = chartQueryRequest.getTitle();
         String goal = chartQueryRequest.getGoal();
         String chartType = chartQueryRequest.getChartType();
@@ -27,7 +24,6 @@ public interface ChartDetailMapper extends BaseMapper<ChartDetail> {
         String sortOrder = chartQueryRequest.getSortOrder();
         Boolean publicOnly = chartQueryRequest.getPublicOnly();
 
-//        queryWrapper.eq(id != null, "id", id);
         queryWrapper.like(StringUtils.isNotBlank(title), "title", title);
         queryWrapper.eq(StringUtils.isNotBlank(goal), "goal", goal);
         queryWrapper.eq(StringUtils.isNotBlank(chartType), "chartType", chartType);

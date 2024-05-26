@@ -111,6 +111,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        // TODO use other token(field) to stand for the login
         String userId = currentUser.getId();
         currentUser = this.getById(userId);
         if (currentUser == null) {
@@ -127,13 +128,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public User getLoginUserPermitNull(HttpServletRequest request) {
-        // Get login state from session
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null || currentUser.getId() == null) {
             return null;
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
+        // TODO use other token(field) to stand for the login
         String userId = currentUser.getId();
         return this.getById(userId);
     }

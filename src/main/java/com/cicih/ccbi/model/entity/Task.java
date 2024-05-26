@@ -15,47 +15,29 @@ import org.jetbrains.annotations.NotNull;
 @Data
 @NoArgsConstructor
 public class Task implements Serializable {
-    /**
-     * id
-     */
     @TableId(type = IdType.INPUT)
     private String id;
-
-    /**
-     * user id
-     */
     private String userId;
-
     /**
-     * content id
+     * content id, includes chart, etc
      */
     private String contentId;
-
     /**
-     * task type
+     * task type, to identity which task
      */
     private Integer type;
-
     /**
      * task status: 0-init, 1-wait, 2-running, 3-succeed, 4-failed
      */
     private Integer status;
-
     /**
-     * created time
+     * execute message, recording fail message, etc.
      */
-    private Date createTime;
-
-    /**
-     * updated time
-     */
-    private Date updateTime;
-
-    /**
-     * delete status
-     */
+    private String execMessage;
     @TableLogic
     private Integer isDelete;
+    private Date createTime;
+    private Date updateTime;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

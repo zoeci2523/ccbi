@@ -10,6 +10,7 @@
             <result property="contentId" column="contentId" jdbcType="BIGINT"/>
             <result property="type" column="type" jdbcType="TINYINT"/>
             <result property="status" column="status" jdbcType="TINYINT"/>
+            <result property="execMessage" column="execMessage" jdbcType="VARCHAR"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
@@ -17,7 +18,7 @@
 
     <sql id="Base_Column_List">
         id,userId,contentId,
-        type,status,createTime,
-        updateTime,isDelete
+        type,status,execMessage,
+        createTime,updateTime,isDelete
     </sql>
 </mapper>

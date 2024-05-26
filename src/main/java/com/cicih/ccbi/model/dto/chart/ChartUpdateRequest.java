@@ -2,6 +2,7 @@ package com.cicih.ccbi.model.dto.chart;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,20 +10,18 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-public class ChartUpdateRequest  implements Serializable {
+public class ChartUpdateRequest implements Serializable {
 
-    @NotNull
     private String id;
-    @Nullable
     private String title;
-    @Nullable
     private String goal;
-    @Nullable
     private String chartData;
-    @Nullable
     private String chartType;
-    @Nullable
     private Integer isDelete;
 
     private static final long serialVersionUID = 1L;
+
+    public boolean validParams() {
+        return id != null && !StringUtils.isAnyBlank(title, goal, chartData, chartType);
+    }
 }
