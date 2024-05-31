@@ -1,0 +1,9 @@
+*/target/*
+**/target/**
+*/.DS_Store
+.DS_Store
+.idea*
+*.iml
+*.log
+**/Test.java
+.vscode
