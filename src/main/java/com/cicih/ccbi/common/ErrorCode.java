@@ -13,6 +13,7 @@ public enum ErrorCode {
     CREATE_ERROR(40401, "create error"),
     UPDATE_ERROR(40402, "update error"),
     DELETE_ERROR(40403, "delete error"),
+    MSG_MISSING_ERROR(40404, "message missing error"),
     FORBIDDEN_ERROR(40300, "access denied"),
     SYSTEM_ERROR(50000, "system error"),
     OPERATION_ERROR(50001, "operation error");
