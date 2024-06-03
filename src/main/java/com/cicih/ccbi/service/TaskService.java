@@ -12,4 +12,10 @@ public interface TaskService extends IService<Task> {
 
     @NotNull
     Task getTaskByQueryParams(@NotNull TaskQueryRequest queryRequest);
+
+    @NotNull
+    Task updateTaskStatus(
+        @NotNull String taskId,
+        @NotNull Task.Status status
+    );
 }

@@ -11,7 +11,6 @@ import com.cicih.ccbi.model.dto.task.TaskQueryRequest;
 import com.cicih.ccbi.model.entity.Task;
 import com.cicih.ccbi.service.TaskService;
 import com.cicih.ccbi.mapper.TaskMapper;
-import org.apache.poi.ss.formula.functions.T;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -42,10 +41,6 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
         return getById(taskId).getId();
     }
 
-    public String updateTaskByContentId(){
-        return null;
-    }
-
     @Override
     @NotNull
     public Task getTaskByQueryParams(@NotNull TaskQueryRequest queryRequest){
@@ -53,6 +48,22 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
         Task task = getOne(queryWrapper);
         ThrowUtils.throwIf(task == null, ErrorCode.NOT_FOUND_ERROR);
         return task;
+    }
+
+    @Override
+    @NotNull
+    public Task updateTaskStatus(
+        @NotNull String taskId,
+        @NotNull Task.Status status
+    ){
+        Task task = new Task();
+        task.setId(taskId);
+        task.setStatus(status.getCode());
+        if (updateById(task)){
+            return taskMapper.selectById(taskId);
+        }else {
+            throw new BusinessException(ErrorCode.UPDATE_ERROR, "Failed to update task status");
+        }
     }
 
 }

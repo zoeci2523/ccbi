@@ -8,6 +8,7 @@ import com.cicih.ccbi.model.entity.ChartDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cicih.ccbi.model.vo.MQTaskResponse;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,4 +26,14 @@ public interface ChartDetailService extends IService<ChartDetail> {
     BaseResponse<MQTaskResponse> startChartGeneration(@NotNull MultipartFile multipartFile,
                                                       @NotNull ChartAddRequest addRequest,
                                                       @NotNull String userId);
+
+    @Nullable
+    ChartDetail getChartByTaskId(@NotNull String taskId);
+
+    @NotNull
+    ChartDetail updateGenChartResult(
+        @NotNull String chartId,
+        @NotNull String genChart,
+        @NotNull String genResult
+    );
 }

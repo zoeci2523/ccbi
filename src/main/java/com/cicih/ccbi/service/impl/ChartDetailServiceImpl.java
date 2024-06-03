@@ -2,6 +2,7 @@ package com.cicih.ccbi.service.impl;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cicih.ccbi.common.BaseResponse;
@@ -27,6 +28,7 @@ import com.cicih.ccbi.service.UserService;
 import com.cicih.ccbi.utils.ExcelUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -141,6 +143,35 @@ public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, Chart
         }
         return ResultUtils.error(ErrorCode.CREATE_ERROR, "Failed to generate chart");
     }
+
+    @Override
+    @Nullable
+    public ChartDetail getChartByTaskId(@NotNull String taskId){
+        // todo 为数据库里的 taskId 加一个 index 和 unique 约束
+        QueryWrapper<ChartDetail> wrapper = new QueryWrapper<>();
+        wrapper.eq("task_id", taskId);
+        return chartDetailMapper.selectOne(wrapper);
+    }
+
+    @Override
+    @NotNull
+    public ChartDetail updateGenChartResult(
+        @NotNull String chartId,
+        @NotNull String genChart,
+        @NotNull String genResult
+    ){
+        ChartDetail updateChartResult = new ChartDetail();
+        updateChartResult.setId(chartId);
+        updateChartResult.setGenerateChart(genChart);
+        updateChartResult.setGenerateResult(genResult);
+        if (updateById(updateChartResult)){
+            return chartDetailMapper.selectById(chartId);
+        }else {
+            throw new BusinessException(ErrorCode.UPDATE_ERROR);
+        }
+    }
+
+
 
 
 }

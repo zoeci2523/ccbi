@@ -15,6 +15,7 @@ import com.cicih.ccbi.exception.BusinessException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Chart;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
@@ -33,7 +34,11 @@ public class GenerateChartMsgConsumer {
     private ChartDetailService chartService;
 
     // TODO 补充生成图的系统设置
-    private static final String CHART_SYSTEM_PROMPT = "";
+    private static final String CHART_SYSTEM_PROMPT = "You are a Data analyst and Frontend developer, please provide output based on the following template and user input. Do not output any header/footer/comments:\n" +
+                                                      "<<<<<\n" +
+                                                      "[Apache Echarts setOption configuration js code version 5.0.0 based on analysis goal and data given by user]\n" +
+                                                      "<<<<<\n" +
+                                                      "[Clear analysis conclusion, be detailed, no comments]";
 
     @SneakyThrows
     @RabbitListener(queues = {MqConstant.BI_QUEUE_NAME}, ackMode = "MANUAL")
@@ -57,9 +62,7 @@ public class GenerateChartMsgConsumer {
             ErrorCode.NOT_FOUND_ERROR,
             "Failed to handle message queue due to chart not found"
         );
-        Task updatedTask = new Task();
-        updatedTask.setId(taskId);
-        updatedTask.setStatus(Task.Status.RUNNING.getCode());
+        Task updatedTask = taskService.updateTaskStatus(taskId, Task.Status.RUNNING);
         if (!taskService.updateById(updatedTask)) {
             channel.basicNack(deliveryTag, false, false);
             handleTaskFailure(task.getId(), "Updated content failed");
@@ -69,11 +72,18 @@ public class GenerateChartMsgConsumer {
         String input = constructInput(chart.getChartType(), chart.getGoal(), chart.getChartData());
         String result = Optional
             .of(Optional
-                .ofNullable(ApiSender.describeChartSync(new ChatRequest(CHART_SYSTEM_PROMPT, input)))
+                .ofNullable(ApiSender.describeChartSync(new ChatRequest(taskId, CHART_SYSTEM_PROMPT, input)))
                 .orElseThrow(() -> new BusinessException(ErrorCode.CREATE_ERROR)))
             .get()
             .getResult();
-        // TODO 调用 e-chart
+        String[] splits = result.split("<<<<<");
+        if (splits.length < 3){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "AI 生成错误");
+        }
+        String genChart = splits[1].trim();
+        String genResult = splits[2].trim();
+        chartService.updateGenChartResult(chart.getId(), genChart, genResult);
+        taskService.updateTaskStatus(taskId, Task.Status.SUCCEED);
     }
 
     private void handleTaskFailure(
@@ -103,7 +113,6 @@ public class GenerateChartMsgConsumer {
          *      May/1,10
          *      May/2,20
          *      May/3,30
-         *  // TODO 补充 让它生成 e-chart 格式的提示词
          */
 
         StringBuilder input = new StringBuilder();

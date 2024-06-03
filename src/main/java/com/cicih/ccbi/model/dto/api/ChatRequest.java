@@ -12,9 +12,11 @@ import org.jetbrains.annotations.Nullable;
 @Data
 @NoArgsConstructor
 public class ChatRequest {
-    private static final String TOGETHER_AI_CHAT_MODEL = "meta-llama/Llama-3-8b-chat-hf";
+    private static final String TOGETHER_AI_CHAT_MODEL = "meta-llama/Llama-3-70b-chat-hf";
     private static final Integer DEFAULT_MAX_TOKEN = 50;
 
+    @NotNull
+    private String taskId;
     @NotNull
     private String prompt; // user prompt
     @Nullable
@@ -28,14 +30,15 @@ public class ChatRequest {
         this.prompt = prompt;
     }
 
-    public ChatRequest(@NotNull String systemPrompt, @NotNull String prompt){
+    public ChatRequest(@NotNull String taskId, @NotNull String systemPrompt, @NotNull String prompt){
+        this.taskId = taskId;
         this.systemPrompt = systemPrompt;
         this.prompt = prompt;
     }
 
     @NotNull
     public ObjectNode buildTogetherAiChatRequest() {
-        /*
+        /**
          * https://docs.together.ai/docs/logprobs
          * template:
          *  {
@@ -43,7 +46,8 @@ public class ChatRequest {
          *      "stream": false,
          *      "max_tokens": 10,
          *      "messages": [
-         *        {"role": "user", "content": "Hello bro"}
+         *        {"role": "system", "content": "{$system_prompt}"}
+         *        {"role": "user", "content": "{$prompt}"}
          *      ],
          *      "echo": true // to get the result
          * }
@@ -57,9 +61,11 @@ public class ChatRequest {
         ObjectNode messageNode = mapper.createObjectNode();
         if (systemPrompt != null) {
             messageNode.put("role", "system");
+            messageNode.put("content", systemPrompt);
             arrayNode.add(messageNode);
         }
         messageNode.put("role", "user");
+        messageNode.put("content", prompt);
         arrayNode.add(messageNode);
         request.putIfAbsent("message", arrayNode);
         request.put("echo", true);

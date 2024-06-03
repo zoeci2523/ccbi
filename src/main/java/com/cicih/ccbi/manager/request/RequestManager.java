@@ -119,6 +119,22 @@ public class RequestManager {
             new DefaultResponseHandler<>(typeReference)
         ));
     }
+    public static void post(
+        @NotNull String url,
+        @Nullable Map<String, String> header,
+        @Nullable ObjectNode body,
+        @NotNull RequestCallback callback
+    ) throws IOException {
+        sendRequest(RequestType.POST,
+            url,
+            header,
+            body,
+            null,
+            null,
+            callback,
+            new DefaultResponseHandler<>()
+        );
+    }
 
     /**
      * Post 请求，同步处理，可以指定请求回调

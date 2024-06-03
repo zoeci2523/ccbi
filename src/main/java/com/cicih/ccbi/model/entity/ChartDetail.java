@@ -51,7 +51,7 @@ public class ChartDetail implements Serializable {
     private String generateChart;
 
     /**
-     * generated result
+     * generated analysis conclusion
      */
     private String generateResult;
 
