@@ -1,0 +1,45 @@
+version: '3.7'
+services:
+  mysql:
+    image: mysql:8.0.36
+    container_name: ccbi-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin123
+#    security_opt:econfined
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+
+  rabbitmq:
+    image: rabbitmq:3.13.3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_NODENAME=myrabbit
+
+  ccbi:
+    image: ccbi
+    container_name: ccbi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    restart: always
+    environment:
+      - spring.datasource.url=jdbc:mysql://mysql:3307/ccbi?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC&autoReconnect=true
+      - spring.datasource.username=root
+      - spring.datasource.password=admin123
+      - task.restart.enabled=false
+    depends_on:
+      - mysql
+      - rabbitmq
+#    external_links:
+#      - mysql:mysql
+
+volumes:
+  mysql-data:

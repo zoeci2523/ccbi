@@ -269,8 +269,9 @@ public class RequestManager {
                 return responseHandler.handle(response);
             } else {
                 String callbackId = String.valueOf(System.currentTimeMillis());
-                httpRequest.setHeader("Success-Callback-Url", "http://generative-paw.mightypaw.info/callback/success");
-                httpRequest.setHeader("Failure-Callback-Url", "http://generative-paw.mightypaw.info/callback/failure");
+                // TODO update callback url header
+                httpRequest.setHeader("Success-Callback-Url", "http://localhost:8080/callback/success");
+                httpRequest.setHeader("Failure-Callback-Url", "http://localhost:8080/callback/failure");
                 httpRequest.setHeader("Callback-Id", callbackId);
 
                 CloseableHttpResponse response = client.execute(httpRequest);
