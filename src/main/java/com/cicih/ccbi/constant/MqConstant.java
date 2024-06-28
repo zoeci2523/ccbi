@@ -1,8 +1,14 @@
 package com.cicih.ccbi.constant;
 
-public interface MqConstant {
+import org.springframework.amqp.rabbit.annotation.Queue;
 
-    String BI_EXCHANGE_NAME = "bi_exchange";
-    String BI_QUEUE_NAME = "bi_queue";
-    String BI_ROUTING_KEY = "bi_routingKey";
+public final class MqConstant {
+
+    public static class Chart{
+        public static final String CHART_EXCHANGE = "chart_exchange";
+        public static final String CHART_QUEUE = "chart_queue";
+        public static final String CHART_ROUTING_KEY = "chart_routingKey";
+    }
+
+
 }

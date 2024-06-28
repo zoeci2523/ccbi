@@ -130,6 +130,7 @@ public class ChartDetailController {
                                                       @NotNull ChartAddRequest chartAddRequest,
                                                       @NotNull HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
+        // todo 检查上传文件
         return chartDetailService.startChartGeneration(multipartFile, chartAddRequest, loginUser.getId());
     }
 

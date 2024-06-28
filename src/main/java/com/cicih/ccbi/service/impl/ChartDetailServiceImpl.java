@@ -155,7 +155,7 @@ public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, Chart
 
     @Override
     @NotNull
-    public ChartDetail updateGenChartResult(
+    public boolean updateGenChartResult(
         @NotNull String chartId,
         @NotNull String genChart,
         @NotNull String genResult
@@ -164,11 +164,7 @@ public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, Chart
         updateChartResult.setId(chartId);
         updateChartResult.setGenerateChart(genChart);
         updateChartResult.setGenerateResult(genResult);
-        if (updateById(updateChartResult)){
-            return chartDetailMapper.selectById(chartId);
-        }else {
-            throw new BusinessException(ErrorCode.UPDATE_ERROR);
-        }
+        return updateById(updateChartResult);
     }
 
 

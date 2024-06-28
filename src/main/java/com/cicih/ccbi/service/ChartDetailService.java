@@ -30,8 +30,7 @@ public interface ChartDetailService extends IService<ChartDetail> {
     @Nullable
     ChartDetail getChartByTaskId(@NotNull String taskId);
 
-    @NotNull
-    ChartDetail updateGenChartResult(
+    boolean updateGenChartResult(
         @NotNull String chartId,
         @NotNull String genChart,
         @NotNull String genResult

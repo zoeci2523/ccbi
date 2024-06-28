@@ -4,7 +4,6 @@ import com.cicih.ccbi.constant.MqConstant;
 import com.cicih.ccbi.controller.ApiSender;
 import com.cicih.ccbi.exception.ThrowUtils;
 import com.cicih.ccbi.model.dto.api.ChatRequest;
-import com.cicih.ccbi.model.dto.api.ChatResponse;
 import com.cicih.ccbi.model.entity.ChartDetail;
 import com.cicih.ccbi.model.entity.Task;
 import com.cicih.ccbi.service.ChartDetailService;
@@ -15,7 +14,6 @@ import com.cicih.ccbi.exception.BusinessException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Chart;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
@@ -23,6 +21,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
@@ -33,20 +32,19 @@ public class GenerateChartMsgConsumer {
     @Resource
     private ChartDetailService chartService;
 
-    // TODO 补充生成图的系统设置
     private static final String CHART_SYSTEM_PROMPT = "You are a Data analyst and Frontend developer, please provide output based on the following template and user input. Do not output any header/footer/comments:\n" +
                                                       "<<<<<\n" +
                                                       "[Apache Echarts setOption configuration js code version 5.0.0 based on analysis goal and data given by user]\n" +
                                                       "<<<<<\n" +
                                                       "[Clear analysis conclusion, be detailed, no comments]";
 
-    @SneakyThrows
-    @RabbitListener(queues = {MqConstant.BI_QUEUE_NAME}, ackMode = "MANUAL")
+
+    @RabbitListener(queues = {MqConstant.Chart.CHART_QUEUE}, ackMode = "MANUAL")
     private void receiveMessage(
         String taskId,
         Channel channel,
         @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag
-    ) {
+    ) throws IOException {
         log.info("receive message from task: {}", taskId);
         if (StringUtils.isBlank(taskId)) {
             channel.basicNack(deliveryTag, false, false);
@@ -64,7 +62,7 @@ public class GenerateChartMsgConsumer {
         );
         Task updatedTask = taskService.updateTaskStatus(taskId, Task.Status.RUNNING);
         if (!taskService.updateById(updatedTask)) {
-            channel.basicNack(deliveryTag, false, false);
+            channel.basicAck(deliveryTag, false); // 主动失败，接收消息，不重试
             handleTaskFailure(task.getId(), "Updated content failed");
             return;
         }
@@ -76,14 +74,21 @@ public class GenerateChartMsgConsumer {
                 .orElseThrow(() -> new BusinessException(ErrorCode.CREATE_ERROR)))
             .get()
             .getResult();
+        // handle AI response
         String[] splits = result.split("<<<<<");
         if (splits.length < 3){
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "AI 生成错误");
         }
         String genChart = splits[1].trim();
         String genResult = splits[2].trim();
-        chartService.updateGenChartResult(chart.getId(), genChart, genResult);
+        // update result
+        if (!chartService.updateGenChartResult(chart.getId(), genChart, genResult)){
+            // 主动失败，不重试
+            handleTaskFailure(task.getId(), "Updated chart result failed");
+        }
         taskService.updateTaskStatus(taskId, Task.Status.SUCCEED);
+        channel.basicAck(deliveryTag, false);
+        // TODO 增加主动推送任务成功/失败的机制
     }
 
     private void handleTaskFailure(
