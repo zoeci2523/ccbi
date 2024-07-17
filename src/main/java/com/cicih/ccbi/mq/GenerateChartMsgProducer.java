@@ -11,6 +11,7 @@ public class GenerateChartMsgProducer extends MsgProducer{
 
     @Override
     public void sendMessage(String message){
+        log.info("Chart producer sent message: {}", message);
         rabbitTemplate.convertAndSend(MqConstant.Chart.CHART_EXCHANGE, MqConstant.Chart.CHART_ROUTING_KEY, message);
     }
 }

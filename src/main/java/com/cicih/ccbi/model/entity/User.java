@@ -6,11 +6,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 
-import com.cicih.ccbi.model.enums.FileUploadBizEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
-import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 @TableName(value = "user")
@@ -54,8 +52,8 @@ public class User implements Serializable {
      * user role：0-user, 1-admin, 2-ban, default 0-user
      */
     private Integer role;
-    private Date createTime;
-    private Date updateTime;
+    private Date createdTime;
+    private Date updatedTime;
     @TableLogic
     private Integer isDelete;
 

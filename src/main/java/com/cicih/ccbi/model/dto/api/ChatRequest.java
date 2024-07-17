@@ -1,6 +1,7 @@
 package com.cicih.ccbi.model.dto.api;
 
 import com.cicih.ccbi.config.JsonConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -64,10 +65,11 @@ public class ChatRequest {
             messageNode.put("content", systemPrompt);
             arrayNode.add(messageNode);
         }
+        messageNode = mapper.createObjectNode();
         messageNode.put("role", "user");
         messageNode.put("content", prompt);
         arrayNode.add(messageNode);
-        request.putIfAbsent("message", arrayNode);
+        request.putIfAbsent("messages", arrayNode);
         request.put("echo", true);
         return request;
     }

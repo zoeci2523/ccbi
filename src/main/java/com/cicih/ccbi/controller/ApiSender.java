@@ -2,6 +2,7 @@ package com.cicih.ccbi.controller;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.cicih.ccbi.common.ErrorCode;
+import com.cicih.ccbi.config.JsonConfig;
 import com.cicih.ccbi.config.ThreadPoolExecutorConfig;
 import com.cicih.ccbi.exception.BusinessException;
 import com.cicih.ccbi.manager.request.RequestCallback;
@@ -40,6 +41,7 @@ public class ApiSender {
             Map<String, String> header = new HashMap<>();
             header.put("Authorization", "Bearer " + CHAT_API_KEY); // add authorization
             ObjectNode body = request.buildTogetherAiChatRequest();
+            System.out.println("request: " + JsonConfig.commonObjectMapper.writeValueAsString(body));
             return RequestManager.post(CHAT_SERVICE_API_ENDPOINT, header, body, new TypeReference<>() {});
         } catch (Exception e) {
             log.error("Fail to describe chart with user input prompt: " + request.getPrompt(), e);
@@ -48,10 +50,8 @@ public class ApiSender {
     }
 
     public ChatResponse describeChartAsync(@NotNull ChatRequest request){
-        // demo
-        String taskName = "test-task";
         CompletableFuture.runAsync(() -> {
-            log.info("Running task: {}, executor: {}", taskName, Thread.currentThread().getName());
+            log.info("Running task: {}, executor: {}", request.getTaskId(), Thread.currentThread().getName());
             try{
                 Map<String, String> header = new HashMap<>();
                 header.put("Authorization", "Bearer " + CHAT_API_KEY); // add authorization

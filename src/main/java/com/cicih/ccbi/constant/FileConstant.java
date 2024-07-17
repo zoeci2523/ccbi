@@ -11,5 +11,5 @@ public interface FileConstant {
      */
     String COS_HOST = "";
     long UPLOAD_FILE_SIZE_LIMITATION = 1024 * 1024L; // 1 MB
-    List<String> VALID_FILE_SUFFIX_LIST = List.of("xlsx", "xls");
+    List<String> VALID_FILE_SUFFIX_LIST = List.of(".csv", ".xlsx", ".xls");
 }

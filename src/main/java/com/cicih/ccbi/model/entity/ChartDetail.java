@@ -58,12 +58,12 @@ public class ChartDetail implements Serializable {
     /**
      * created time
      */
-    private Date createTime;
+    private Date createdTime;
 
     /**
      * updated time
      */
-    private Date updateTime;
+    private Date updatedTime;
 
     /**
      * be public or not, 0-public, 1-private

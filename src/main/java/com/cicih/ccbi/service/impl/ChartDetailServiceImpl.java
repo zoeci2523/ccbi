@@ -2,6 +2,7 @@ package com.cicih.ccbi.service.impl;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
+import com.alibaba.excel.support.ExcelTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
+import org.springframework.retry.backoff.ThreadWaitSleeper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,8 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 
 @Service
-public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, ChartDetail>
-        implements ChartDetailService {
+public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, ChartDetail> implements ChartDetailService {
 
 
     @Resource
@@ -55,7 +56,10 @@ public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, Chart
     @Override
     @NotNull
     @Transactional(rollbackFor = Exception.class)
-    public String create(@NotNull ChartAddRequest chartAddRequest, @NotNull String userId) {
+    public String create(
+        @NotNull ChartAddRequest chartAddRequest,
+        @NotNull String userId
+    ) {
         ThrowUtils.throwIf(!chartAddRequest.validParams(), ErrorCode.PARAMS_ERROR);
         // initialize task
         String chartId = "content-" + UUID.fastUUID();
@@ -74,13 +78,20 @@ public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, Chart
 
     @Override
     @NotNull
-    public boolean delete(@NotNull String contentId, @NotNull String userId) {
+    public boolean delete(
+        @NotNull String contentId,
+        @NotNull String userId
+    ) {
         ChartDetail chart = getById(contentId);
-        ThrowUtils.throwIf(chart == null, new BusinessException(ErrorCode.DELETE_ERROR,
-                "Failed to delete chart - chart not found"));
+        ThrowUtils.throwIf(
+            chart == null,
+            new BusinessException(ErrorCode.DELETE_ERROR, "Failed to delete chart - chart not found")
+        );
         User user = userService.getById(userId);
-        ThrowUtils.throwIf(user == null, new BusinessException(ErrorCode.DELETE_ERROR,
-                "Failed to delete chart = user not found"));
+        ThrowUtils.throwIf(
+            user == null,
+            new BusinessException(ErrorCode.DELETE_ERROR, "Failed to delete chart = user not found")
+        );
         if (!chart.getUserId().equals(userId) && !userService.isAdmin(user)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
@@ -96,57 +107,68 @@ public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, Chart
         if (request.getUserId() != null) {
             ThrowUtils.throwIf(userService.getById(request.getUserId()) == null, ErrorCode.NOT_FOUND_ERROR);
         }
-        return page(new Page<>(current, size),
-                chartDetailMapper.getQueryWrapper(request));
+        return page(new Page<>(current, size), chartDetailMapper.getQueryWrapper(request));
     }
 
     @Override
-    public BaseResponse<MQTaskResponse> startChartGeneration(@NotNull MultipartFile multipartFile,
-                                                             @NotNull ChartAddRequest addRequest,
-                                                             @NotNull String userId) {
+    public BaseResponse<MQTaskResponse> startChartGeneration(
+        @NotNull MultipartFile multipartFile,
+        @NotNull ChartAddRequest addRequest,
+        @NotNull String userId
+    ) {
         // validate file
         String title = addRequest.getTitle();
-        ThrowUtils.throwIf(StringUtils.isNotBlank(title) && title.length() > 100, ErrorCode.PARAMS_ERROR,
-                "The length of chart title cannot be more than 100");
+        ThrowUtils.throwIf(StringUtils.isNotBlank(title) && title.length() > 100,
+            ErrorCode.PARAMS_ERROR,
+            "The length of chart title cannot be more than 100"
+        );
         long size = multipartFile.getSize();
+        ThrowUtils.throwIf(size > FileConstant.UPLOAD_FILE_SIZE_LIMITATION,
+            ErrorCode.PARAMS_ERROR,
+            "Upload file cannot be over 1MB"
+        );
         String originalFilename = multipartFile.getOriginalFilename();
-        ThrowUtils.throwIf(size > FileConstant.UPLOAD_FILE_SIZE_LIMITATION, ErrorCode.PARAMS_ERROR,
-                "Upload file cannot be over 1MB");
-        String suffix = FileUtil.getSuffix(originalFilename);
-        ThrowUtils.throwIf(!FileConstant.VALID_FILE_SUFFIX_LIST.contains(suffix), ErrorCode.PARAMS_ERROR,
-                "Invalid file suffix");
+        String suffix = "." + FileUtil.getSuffix(originalFilename);
+        ThrowUtils.throwIf(!FileConstant.VALID_FILE_SUFFIX_LIST.contains(suffix),
+            ErrorCode.PARAMS_ERROR,
+            "Invalid file suffix"
+        );
 
         // validate user qualification
         User user = userService.getById(userId);
         ThrowUtils.throwIf(user == null, ErrorCode.CREATE_ERROR, "User not found");
         // TODO limit maximum number of chart can generate based on user's level
-//        ThrowUtils.throwIf(levelService.getTaskLimit(user.getLevelId()), ErrorCode.CREATE_ERROR,
-//                "Fail to generate chart since the number of running tasks exceed the limit on current level.");
+        //        ThrowUtils.throwIf(levelService.getTaskLimit(user.getLevelId()), ErrorCode.CREATE_ERROR,
+        //                "Fail to generate chart since the number of running tasks exceed the limit on current level.");
 
         // TODO save raw file to S3 (or other) in the future
         // save chart and send message
-        addRequest.setChartData(ExcelUtils.excelToCsv(multipartFile));
+        addRequest.setChartData(ExcelUtils.fileToString(multipartFile, suffix));
         String chartId = create(addRequest, userId);
-        TaskQueryRequest queryRequest = TaskQueryRequest.builder().contentId(chartId).userId(userId).build();
-        if (queryRequest.validParams()){
-            Task task = taskService.getTaskByQueryParams(queryRequest);
-            chartMsgProducer.sendMessage(chartId);
-            MQTaskResponse mqTaskResponse = new MQTaskResponse();
-            mqTaskResponse.setTaskId(task.getId());
-            // update task status if message send out successfully
-            TaskUpdateRequest updateRequest = new TaskUpdateRequest();
-            updateRequest.setId(task.getId());
-            updateRequest.setStatus(Task.Status.WAITING);
-            if (taskService.update(taskMapper.getUpdateWrapper(updateRequest))){
-                return ResultUtils.success(mqTaskResponse);
-            };
+        TaskQueryRequest queryRequest =
+            TaskQueryRequest.builder()
+                            .userId(userId)
+                            .contentId(chartId)
+                            .build();
+        ThrowUtils.throwIf(!queryRequest.validParams(), ErrorCode.CREATE_ERROR, "Invalid task query param");
+        Task task = taskService.getTaskByQueryParams(queryRequest);
+        chartMsgProducer.sendMessage(task.getId());
+
+        MQTaskResponse mqTaskResponse = new MQTaskResponse();
+        mqTaskResponse.setTaskId(task.getId());
+        // update task status if message send out successfully
+        TaskUpdateRequest updateRequest = new TaskUpdateRequest();
+        updateRequest.setId(task.getId());
+        updateRequest.setStatus(Task.Status.WAITING);
+        if (!taskService.update(taskMapper.getUpdateWrapper(updateRequest))) {
+            return ResultUtils.error(ErrorCode.CREATE_ERROR, "Failed to generate chart");
         }
-        return ResultUtils.error(ErrorCode.CREATE_ERROR, "Failed to generate chart");
+        return ResultUtils.success(mqTaskResponse);
     }
 
     @Override
     @Nullable
-    public ChartDetail getChartByTaskId(@NotNull String taskId){
+    public ChartDetail getChartByTaskId(@NotNull String taskId) {
         // todo 为数据库里的 taskId 加一个 index 和 unique 约束
         QueryWrapper<ChartDetail> wrapper = new QueryWrapper<>();
         wrapper.eq("task_id", taskId);
@@ -159,15 +181,13 @@ public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, Chart
         @NotNull String chartId,
         @NotNull String genChart,
         @NotNull String genResult
-    ){
+    ) {
         ChartDetail updateChartResult = new ChartDetail();
         updateChartResult.setId(chartId);
         updateChartResult.setGenerateChart(genChart);
         updateChartResult.setGenerateResult(genResult);
         return updateById(updateChartResult);
     }
-
-
 
 
 }

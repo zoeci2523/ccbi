@@ -36,8 +36,8 @@ public class Task implements Serializable {
     private String execMessage;
     @TableLogic
     private Integer isDelete;
-    private Date createTime;
-    private Date updateTime;
+    private Date createdTime;
+    private Date updatedTime;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

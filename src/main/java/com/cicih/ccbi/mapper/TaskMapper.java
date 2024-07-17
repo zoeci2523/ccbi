@@ -22,8 +22,8 @@ public interface TaskMapper extends BaseMapper<Task> {
         QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
         String userId = taskQueryRequest.getUserId();
         String contentId = taskQueryRequest.getContentId();
-        Integer type = taskQueryRequest.getType().getCode();
-        Integer status = taskQueryRequest.getStatus().getCode();
+        Integer type = taskQueryRequest.getType() == null ? null : taskQueryRequest.getType().getCode();
+        Integer status = taskQueryRequest.getStatus() == null ? null : taskQueryRequest.getStatus().getCode();
 
         queryWrapper.eq(StringUtils.isNotBlank(userId), "userId", userId);
         queryWrapper.eq(StringUtils.isNotBlank(contentId), "contentId", contentId);
@@ -36,11 +36,11 @@ public interface TaskMapper extends BaseMapper<Task> {
     default UpdateWrapper<Task> getUpdateWrapper(@NotNull TaskUpdateRequest taskUpdateRequest){
         UpdateWrapper<Task> updateWrapper = new UpdateWrapper<>();
         String id = taskUpdateRequest.getId();
-        Integer status = taskUpdateRequest.getStatus().getCode();
+        Integer status = taskUpdateRequest.getStatus() == null ? null : taskUpdateRequest.getStatus().getCode();
 
         updateWrapper.eq( "id", id);
         updateWrapper.set(status != null, "status", status);
-        updateWrapper.setSql("updated_time = NOW()");
+        updateWrapper.setSql("updatedTime = NOW()");
         return updateWrapper;
     }
 
