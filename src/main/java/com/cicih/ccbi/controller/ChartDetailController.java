@@ -10,6 +10,7 @@ import com.cicih.ccbi.exception.ThrowUtils;
 import com.cicih.ccbi.model.dto.chart.*;
 import com.cicih.ccbi.model.entity.ChartDetail;
 import com.cicih.ccbi.model.entity.User;
+import com.cicih.ccbi.model.vo.ChartVO;
 import com.cicih.ccbi.model.vo.MQTaskResponse;
 import com.cicih.ccbi.service.ChartDetailService;
 import com.cicih.ccbi.service.UserService;
@@ -92,8 +93,8 @@ public class ChartDetailController {
      * @return
      */
     @PostMapping("/my/list/page")
-    public BaseResponse<Page<ChartDetail>> listMyChartByPage(@RequestBody ChartQueryRequest chartQueryRequest,
-                                                             HttpServletRequest request) {
+    public BaseResponse<Page<ChartVO>> listMyChartByPage(@RequestBody ChartQueryRequest chartQueryRequest,
+                                                         HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         chartQueryRequest.setUserId(loginUser.getId());
         return ResultUtils.success(chartDetailService.getChartByPage(chartQueryRequest));
@@ -106,7 +107,7 @@ public class ChartDetailController {
      * @return
      */
     @PostMapping("/list/page")
-    public BaseResponse<Page<ChartDetail>> listChartByPage(@RequestBody ChartQueryRequest chartQueryRequest) {
+    public BaseResponse<Page<ChartVO>> listChartByPage(@RequestBody ChartQueryRequest chartQueryRequest) {
         return ResultUtils.success(chartDetailService.getChartByPage(chartQueryRequest));
     }
 

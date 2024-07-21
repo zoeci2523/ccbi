@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 @NoArgsConstructor
 public class ChatRequest {
     private static final String TOGETHER_AI_CHAT_MODEL = "meta-llama/Llama-3-70b-chat-hf";
-    private static final Integer DEFAULT_MAX_TOKEN = 50;
+    private static final Integer DEFAULT_MAX_TOKEN = 1000;
 
     @NotNull
     private String taskId;

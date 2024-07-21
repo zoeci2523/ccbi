@@ -34,7 +34,7 @@ public class GenerateChartMsgConsumer {
 
     private static final String CHART_SYSTEM_PROMPT = "You are a Data analyst and Frontend developer, please provide output based on the following template and user input. Do not output any header/footer/comments:\n" +
                                                       "<<<<<\n" +
-                                                      "[Apache Echarts setOption configuration js code version 5.0.0 based on analysis goal and data given by user]\n" +
+                                                      "[Apache Echarts setOption configuration json object version 5.0.0 based on analysis goal and data given by user]\n" +
                                                       "<<<<<\n" +
                                                       "[Clear analysis conclusion, be detailed, no comments]";
 
@@ -75,13 +75,12 @@ public class GenerateChartMsgConsumer {
             System.out.println("======== result: " + JsonConfig.commonObjectMapper.writeValueAsString(result));
 
             // handle AI response
-            // todo 换一种
-            String[] splits = result.split("<<<<<");
-            if (splits.length < 3){
+            String[] splits = result.split("\n\n");
+            if (splits.length < 1){
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "AI 生成错误");
             }
-            String genChart = splits[1].trim();
-            String genResult = splits[2].trim();
+            String genChart = splits[0].trim();
+            String genResult = splits[1].trim();
             // update result
             if (!chartService.updateGenChartResult(chart.getId(), genChart, genResult)){
                 handleTaskFailure(task.getId(), "Updated chart result failed");

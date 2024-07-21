@@ -8,9 +8,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cicih.ccbi.utils.SqlUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Chart;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public interface ChartDetailMapper extends BaseMapper<ChartDetail> {
 

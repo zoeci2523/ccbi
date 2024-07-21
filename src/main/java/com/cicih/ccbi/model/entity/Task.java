@@ -3,6 +3,7 @@ package com.cicih.ccbi.model.entity;
 import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -42,7 +43,11 @@ public class Task implements Serializable {
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
-    public Task(@NotNull String userId, @NotNull String contentId, @NotNull Type type) {
+    public Task(
+        @NotNull String userId,
+        @NotNull String contentId,
+        @NotNull Type type
+    ) {
         this.userId = userId;
         this.contentId = contentId;
         this.type = type.getCode();
@@ -52,8 +57,7 @@ public class Task implements Serializable {
     @AllArgsConstructor
     public enum Type {
         // Task type: 0-chart, 1-chat ...
-        CHART(0, "chart"),
-        CHAT(1, "chat");
+        CHART(0, "chart"), CHAT(1, "chat");
 
         @NotNull
         private final Integer code;
@@ -65,7 +69,7 @@ public class Task implements Serializable {
     @AllArgsConstructor
     public enum Status {
         // Task status: 0-init, 1-wait, 2-running, 3-succeed, 4-failed
-        INIT(0, "initialization"),
+        INIT(0, "initializing"),
         WAITING(1, "waiting"),
         RUNNING(2, "running"),
         SUCCEED(3, "succeed"),
@@ -74,6 +78,14 @@ public class Task implements Serializable {
         @NotNull
         private final Integer code;
         @NotNull
-        private final String message;
+        private final String value;
+
+        public static Status from(@NotNull Integer code) throws Exception {
+            return Arrays
+                .stream(Status.values())
+                .filter(status -> status.getCode().equals(code))
+                .findFirst()
+                .orElseThrow(() -> new Exception("Invalid task status code"));
+        }
     }
 }

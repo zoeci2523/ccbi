@@ -11,13 +11,11 @@ public class PageRequest {
     /**
      * current page
      */
-    @NotNull
     private long current = 1;
 
     /**
      * page size
      */
-    @NotNull
     private long pageSize = 10;
 
     /**

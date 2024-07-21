@@ -20,6 +20,7 @@ import com.cicih.ccbi.model.dto.task.TaskUpdateRequest;
 import com.cicih.ccbi.model.entity.ChartDetail;
 import com.cicih.ccbi.model.entity.Task;
 import com.cicih.ccbi.model.entity.User;
+import com.cicih.ccbi.model.vo.ChartVO;
 import com.cicih.ccbi.model.vo.MQTaskResponse;
 import com.cicih.ccbi.mq.GenerateChartMsgProducer;
 import com.cicih.ccbi.service.ChartDetailService;
@@ -37,6 +38,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, ChartDetail> implements ChartDetailService {
@@ -99,7 +103,7 @@ public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, Chart
     }
 
     @Override
-    public Page<ChartDetail> getChartByPage(@NotNull ChartQueryRequest request) {
+    public Page<ChartVO> getChartByPage(@NotNull ChartQueryRequest request) {
         long current = request.getCurrent();
         long size = request.getPageSize();
         // limit the maximum size for getting a page
@@ -107,7 +111,27 @@ public class ChartDetailServiceImpl extends ServiceImpl<ChartDetailMapper, Chart
         if (request.getUserId() != null) {
             ThrowUtils.throwIf(userService.getById(request.getUserId()) == null, ErrorCode.NOT_FOUND_ERROR);
         }
-        return page(new Page<>(current, size), chartDetailMapper.getQueryWrapper(request));
+        QueryWrapper<ChartDetail> queryWrapper = chartDetailMapper.getQueryWrapper(request);
+        List<ChartDetail> chartList = chartDetailMapper.selectList(queryWrapper);
+        Page<ChartVO> chartVOPage = new Page<>(current, size);
+        List<ChartVO> chartVOList = new ArrayList<>();
+        if (!chartList.isEmpty()) {
+            chartList.stream().peek(
+                chart -> {
+                    ChartVO chartVO = new ChartVO();
+                    BeanUtils.copyProperties(chart, chartVO);
+                    Task task = taskService.getTaskByQueryParams(TaskQueryRequest.builder().contentId(chart.getId()).build());
+                    try {
+                        chartVO.setStatus(Task.Status.from(task.getStatus()).getValue());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    chartVOList.add(chartVO);
+                }
+            ).collect(Collectors.toList());
+        }
+        chartVOPage.setRecords(chartVOList);
+        return chartVOPage;
     }
 
     @Override

@@ -15,6 +15,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ChartQueryRequest extends PageRequest implements Serializable {
 
+    private String id;
     private String userId;
     private String title;
     private String goal;

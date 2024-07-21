@@ -6,6 +6,7 @@ import com.cicih.ccbi.model.dto.chart.ChartAddRequest;
 import com.cicih.ccbi.model.dto.chart.ChartQueryRequest;
 import com.cicih.ccbi.model.entity.ChartDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cicih.ccbi.model.vo.ChartVO;
 import com.cicih.ccbi.model.vo.MQTaskResponse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +22,7 @@ public interface ChartDetailService extends IService<ChartDetail> {
     @NotNull
     boolean delete(@NotNull String contentId, @NotNull String userId);
 
-    Page<ChartDetail> getChartByPage(@NotNull ChartQueryRequest chartQueryRequest);
+    Page<ChartVO> getChartByPage(@NotNull ChartQueryRequest chartQueryRequest);
 
     BaseResponse<MQTaskResponse> startChartGeneration(@NotNull MultipartFile multipartFile,
                                                       @NotNull ChartAddRequest addRequest,
