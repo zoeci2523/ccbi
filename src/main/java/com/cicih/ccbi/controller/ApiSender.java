@@ -27,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 public class ApiSender {
 
+    // TODO replace as your own API key
     private static final String CHAT_API_KEY = "";
     private static final String CHAT_SERVICE_API_ENDPOINT = "https://api.together.xyz/v1/chat/completions";
 
