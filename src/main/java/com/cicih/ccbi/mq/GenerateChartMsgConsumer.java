@@ -72,7 +72,6 @@ public class GenerateChartMsgConsumer {
 
             ChatResponse chatResult = ApiSender.describeChartSync(new ChatRequest(taskId, CHART_SYSTEM_PROMPT, input));
             String result = chatResult.getChoices().get(0).getMessage().getContent();
-            System.out.println("======== result: " + JsonConfig.commonObjectMapper.writeValueAsString(result));
 
             // handle AI response
             String[] splits = result.split("\n\n");
@@ -131,6 +130,5 @@ public class GenerateChartMsgConsumer {
         input.append(chartData).append("\n");
         return new String(input);
     }
-
 
 }

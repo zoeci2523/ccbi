@@ -27,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 public class ApiSender {
 
-    private static final String CHAT_API_KEY = "409d1965f9856db4e1702139dc618b9cf9d93ceb2700f4a65b8834bede73ccac";
+    private static final String CHAT_API_KEY = "";
     private static final String CHAT_SERVICE_API_ENDPOINT = "https://api.together.xyz/v1/chat/completions";
 
     @Resource
